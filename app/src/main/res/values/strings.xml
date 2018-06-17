@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">NetChess</string>
+    <!--Menu-->
+    <string name="search">Search</string>
+    <!--Navigation drawer-->
+    <string name="open_drawer">Open Drawer</string>
+    <string name="close_drawer">Close Drawer</string>
+    <!--Menu navigation items-->
+    <string name="navigation_current_game">Current Game</string>
+    <string name="navigation_new_game">New Game</string>
+    <string name="navigation_profile">Profile</string>
+    <string name="navigation_rank_list">Rank List</string>
+    <string name="navigation_exit">Exit</string>
+
+</resources>
