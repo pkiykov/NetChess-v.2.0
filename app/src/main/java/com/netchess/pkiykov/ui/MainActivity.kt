@@ -7,6 +7,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
@@ -31,11 +32,12 @@ class MainActivity : BaseActivity() {
     private lateinit var fragment: BaseView
     private lateinit var drawerToggle: ActionBarDrawerToggle
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override val contentViewId = R.layout.activity_main
+
+    override fun onCreateActivity(savedInstanceState: Bundle?) {
         MainApplication.graph.inject(this)
         initViews()
+        selectFragment()
     }
 
     private fun initViews() {
@@ -47,25 +49,6 @@ class MainActivity : BaseActivity() {
             setHomeAsUpIndicator(R.drawable.ic_menu_arrow_back)
         }
         drawerLayout = findViewById(R.id.drawerLayout)
-        drawerLayout.addDrawerListener(
-                object : DrawerLayout.DrawerListener {
-                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                        // Respond when the drawer's position changes
-                    }
-
-                    override fun onDrawerOpened(drawerView: View) {
-                        // Respond when the drawer is opened
-                    }
-
-                    override fun onDrawerClosed(drawerView: View) {
-                        // Respond when the drawer is closed
-                    }
-
-                    override fun onDrawerStateChanged(newState: Int) {
-                        // Respond when the drawer motion state changes
-                    }
-                }
-        )
         drawerToggle = object : ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer) {
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
@@ -117,6 +100,9 @@ class MainActivity : BaseActivity() {
                 drawerLayout.openDrawer(GravityCompat.START)
                 true
             }
+            R.id.action_search -> {
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -129,6 +115,11 @@ class MainActivity : BaseActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         drawerToggle.onConfigurationChanged(newConfig)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return super.onPrepareOptionsMenu(menu)
     }
 
 }

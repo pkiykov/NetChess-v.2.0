@@ -12,4 +12,10 @@
     <string name="navigation_rank_list">Rank List</string>
     <string name="navigation_exit">Exit</string>
 
+    <!--Screen Profile -->
+    <string name="your_photo">Your photo</string>
+    <string name="delete_photo">Delete photo</string>
+    <string name="logout">Logout</string>
+    <string name="upload_photo">Upload photo</string>
+
 </resources>
