@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/main_background_port"
+              android:gravity="center"
+              android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/email_edit_text"
+        style="@style/onBoarding_edit_text_field"
+        android:layout_width="@dimen/onboarding_edit_text_field_width"
+        android:layout_height="wrap_content"
+        android:hint="@string/hintEmail"
+        android:inputType="textEmailAddress"/>
+
+    <EditText
+        android:id="@+id/password_edit_text"
+        style="@style/onBoarding_edit_text_field"
+        android:layout_width="@dimen/onboarding_edit_text_field_width"
+        android:layout_height="wrap_content"
+        android:hint="@string/hintPass"
+        android:inputType="textPassword"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/onboarding_default_padding"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/login_button"
+            style="@style/onBoarding_margin"
+            android:layout_width="@dimen/login_button_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/transparent_gradient_background"
+            android:text="@string/login"
+            android:textColor="@color/white"/>
+
+        <Button
+            android:id="@+id/registration_button"
+            style="@style/onBoarding_margin"
+            android:layout_width="@dimen/login_button_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/transparent_gradient_background"
+            android:text="@string/new_account"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+</LinearLayout>

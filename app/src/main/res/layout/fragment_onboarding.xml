@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/onboarding_background_port"
+              android:gravity="center"
+              android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/name_edit_text"
+        style="@style/onBoarding_edit_text_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/onboarding_default_padding"
+        android:hint="@string/hintName"
+        android:inputType="textEmailAddress"
+        android:maxLength="60"/>
+
+    <EditText
+        android:id="@+id/email_edit_text"
+        style="@style/onBoarding_edit_text_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hintEmail"
+        android:inputType="textEmailAddress"/>
+
+    <EditText
+        android:id="@+id/password_edit_text"
+        style="@style/onBoarding_edit_text_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hintPass"
+        android:inputType="textPassword"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/onboarding_default_padding"
+        android:gravity="center"
+        android:text="@string/birthdate"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/white"/>
+
+    <DatePicker
+        android:id="@+id/birthdate_picker"
+        style="@android:style/Widget.DatePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </DatePicker>
+
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/onboarding_default_padding"
+        android:background="@drawable/transparent_gradient_background"
+        android:text="@string/submit"
+        android:textColor="@color/white"/>
+
+</LinearLayout>

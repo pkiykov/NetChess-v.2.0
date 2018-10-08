@@ -12,13 +12,14 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:background="@color/transparent"
             android:id="@+id/avatar_image"
             android:layout_width="@dimen/avatar_size"
             android:layout_height="@dimen/avatar_size"
             android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
+            android:padding="@dimen/app_padding_small"
             android:contentDescription="@string/your_photo"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:src="@drawable/empty_avatar"/>
 
         <TextView
@@ -45,43 +46,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/upload_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/app_padding"
-                android:background="?attr/selectableItemBackground"
-                android:text="@string/upload_photo"
-                android:textAllCaps="false"
-                android:visibility="gone"/>
-
-            <ImageButton
-                android:id="@+id/delete_avatar"
-                android:layout_width="@dimen/app_padding"
-                android:layout_height="@dimen/app_padding"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/app_padding"
-                android:layout_toEndOf="@+id/upload_photo"
-                android:layout_toRightOf="@+id/upload_photo"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/delete_photo"
-                android:scaleType="centerInside"
-                android:src="@drawable/delete_avatar"
-                android:visibility="gone"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ListView
-                android:id="@+id/info_list_view"
+            <android.support.v4.widget.SwipeRefreshLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/swipe_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent"
+                android:layout_above="@+id/logout">
 
-            </ListView>
+                <ListView
+                    android:id="@android:id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </android.support.v4.widget.SwipeRefreshLayout>
 
             <Button
+                android:layout_margin="@dimen/app_padding"
                 android:id="@+id/logout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -90,8 +70,7 @@
                 android:layout_gravity="center"
                 android:background="?attr/selectableItemBackground"
                 android:text="@string/logout"
-                android:textAllCaps="false"
-                android:visibility="gone"/>
+                android:textAllCaps="false"/>
 
         </RelativeLayout>
     </LinearLayout>

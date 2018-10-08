@@ -17,5 +17,65 @@
     <string name="delete_photo">Delete photo</string>
     <string name="logout">Logout</string>
     <string name="upload_photo">Upload photo</string>
+    <string name="avatar_has_been_removed">Avatar has been removed</string>
+    <string name="removing_avatar_failed">Failed to remove avatar, try again</string>
+    <string name="name_can_not_be_empty">Name can not be empty</string>
+    <string name="name_has_been_changed">Name has been changed</string>
+    <string name="dialog_input_name">Input your name</string>
+    <string name="enter_name">Enter name</string>
+    <string name="image_has_not_been_selected">Image has not been selected</string>
+
+    <!--Player Info -->
+    <string name="wins">Wins:</string>
+    <string name="draws">Draws:</string>
+    <string name="losses">Losses:</string>
+    <string name="age">Age:</string>
+    <string name="rating">Rating:</string>
+    <string name="total">Total games:</string>
+
+    <!--OnBoarding screen -->
+    <string name="hintEmail">Email</string>
+    <string name="hintPass">Password</string>
+    <string name="hintName">Visible name for other players</string>
+    <string name="birthdate">Birthdate:</string>
+    <string name="submit">Submit</string>
+
+    <!--Birthdate dialog -->
+    <string name="player_birthdate">Player\'s birthdate is </string>
+    <string name="chose_new_date">Select new date:</string>
+    <string name="birthdate_has_been_changed">Birthdate has been changed</string>
+
+    <!--Dialogs -->
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="connection_problem">Connection problem</string>
+    <string name="camera_or_gallery">Take new photo or select from gallery?</string>
+    <string name="take_photo">New</string>
+    <string name="select_photo">Select</string>
+    <string name="button_ok_text">OK</string>
+    <string name="progress_dialog_title">Please, wait</string>
+
+    <!-- Errors -->
+    <string name="error_title">Error</string>
+    <string name="error_unknown">Oops!Something went wrong… Please, try again later</string>
+    <string name="network_error">Internet connection error</string>
+    <string name="error_credentials_incorrect">[errorUserNotValid]</string>
+    <string name="player_not_exist">Player doesn\'t exist anymore :(</string>
+    <string name="permissions_not_granted">Cancelling, required permissions are not granted</string>
+
+    <!-- Login and onBoarding-->
+    <string name="login">Login</string>
+    <string name="new_account">New Account</string>
+    <string name="welcome_onboard">Welcome on board, %s!</string>
+    <string name="too_short_credentials">Username and password should have at least %d symbols</string>
+    <string name="invalid_password">Invalid password</string>
+    <string name="invalid_username">Invalid username</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="fail_to_load_avatar">Can\'t load your avatar. Something went wrong...</string>
+    <string name="do_you_want_to_remove_avatar">Do you want to remove this photo?</string>
+
+    <!-- TAGS-->
+    <item name="avatar_tag" type="id"/>
+
 
 </resources>

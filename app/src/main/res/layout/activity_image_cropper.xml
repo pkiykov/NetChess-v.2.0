@@ -1,0 +1,7 @@
+<!-- Image Cropper fill the remaining available height -->
+<com.theartofdev.edmodo.cropper.CropImageView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cropImageView"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"/>

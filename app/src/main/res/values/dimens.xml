@@ -10,4 +10,13 @@
 
     <dimen name="medium_title_text_size">18sp</dimen>
     <dimen name="medium_title_small_text_size">14sp</dimen>
+
+    <item name="half_transparency" format="float" type="dimen">0.5</item>
+
+    <!--OnBoarding -->
+    <dimen name="submit_button_margin">48dp</dimen>
+    <dimen name="onboarding_default_padding">24dp</dimen>
+    <dimen name="login_button_width">120dp</dimen>
+    <dimen name="onboarding_edit_text_field_width">288dp</dimen>
+    <dimen name="half_avatar_size">60dp</dimen>
 </resources>
