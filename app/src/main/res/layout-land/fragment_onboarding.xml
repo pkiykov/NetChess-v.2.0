@@ -58,7 +58,7 @@
 
 
         <DatePicker
-            android:id="@+id/birthdate_picker"
+            android:id="@+id/birthdate"
             style="@android:style/Widget.DatePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -67,7 +67,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/submit_button"
+        android:id="@+id/submitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

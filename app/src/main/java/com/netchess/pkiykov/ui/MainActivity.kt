@@ -17,7 +17,13 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.netchess.pkiykov.R
 import com.netchess.pkiykov.core.App
 import com.netchess.pkiykov.ui.NavigationItem.*
@@ -35,16 +41,42 @@ class MainActivity : BaseActivity() {
     lateinit var firebaseAuth: FirebaseAuth
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToggle: ActionBarDrawerToggle
-
+    private lateinit var googleSignInClient: GoogleSignInClient
     override val contentViewId = R.layout.activity_main
 
     override fun onCreateActivity(savedInstanceState: Bundle?) {
         App.applicationComponent.inject(this)
         initViews()
 
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_id))
+                .requestEmail()
+                .build()
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
         if (getMainFragment() == null) {
             openFirstScreen()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        // updateUI(account)
+    }
+
+    private fun updateUI(account: GoogleSignInAccount?) {
+        if (account == null) {
+            fragment?.showSimpleSnackbarMessage("u have been signed out")
+        } else {
+            fragment?.showSimpleSnackbarMessage("weeeelcome, ${account.displayName} !!!")
+        }
+
+        openFirstScreen()
     }
 
     private fun initViews() {
@@ -95,6 +127,10 @@ class MainActivity : BaseActivity() {
         drawerLayout.post { enableNavigationItem(CURRENT_GAME, false) }
     }
 
+    fun signIn() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
 
     private fun openFirstScreen() {
         fragment = if (firebaseAuth.currentUser == null) {
@@ -174,6 +210,10 @@ class MainActivity : BaseActivity() {
         firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
     }
 
+    companion object {
+        private const val RC_SIGN_IN = 3476
+    }
+
 
     private var cropImageUri: Uri? = null
 
@@ -181,6 +221,19 @@ class MainActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)
+                firebaseAuthWithGoogle(account!!)
+            } catch (e: ApiException) {
+                // Google Sign In failed, update UI appropriately
+
+                // ...
+            }
+        }
         // handle result of pick image chooser
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val imageUri = CropImage.getPickImageResultUri(this, data)
@@ -198,10 +251,34 @@ class MainActivity : BaseActivity() {
                 getProfileView()?.presenter?.uploadAvatar(result.uri)
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 //TODO: Add logging
-                val error = result.error
+                // val error = result.error
                 Snackbar.make(drawerLayout, R.string.image_has_not_been_selected, Snackbar.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
+        // [START_EXCLUDE silent]
+        fragment?.showProgressDialog()
+        // [END_EXCLUDE]
+
+        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this) { task ->
+                    fragment?.dismissProgressDialog()
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        val user = firebaseAuth.currentUser
+                        // updateUI(user)
+                        user?.let {
+                            fragment?.showSimpleSnackbarMessage("weeeelcome, ${user.displayName} !!!")
+                            openFirstScreen()
+                        }
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        updateUI(null)
+                    }
+                }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -233,5 +310,15 @@ class MainActivity : BaseActivity() {
             return
         }
         super.onBackPressed()
+    }
+
+    fun signOut() {
+        // Firebase sign out
+        firebaseAuth.signOut()
+
+        // Google sign out
+        googleSignInClient.signOut().addOnCompleteListener(this) {
+            updateUI(null)
+        }
     }
 }

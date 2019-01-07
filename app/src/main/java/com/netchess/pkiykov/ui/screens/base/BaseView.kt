@@ -18,13 +18,11 @@ abstract class BaseView : Fragment(), ICleanArchitecture.View {
     protected lateinit var rootView: View
     protected lateinit var compositeDisposable: CompositeDisposable
     protected lateinit var dialogManager: DialogManager
-    //  @State protected var isDialogVisible = false
+    //@State @JvmField protected var shouldShowDialog = false
 
     abstract val name: String?
 
     protected abstract fun initPresenter()
-
-    protected abstract fun bindViews()
 
     @LayoutRes
     protected abstract fun getContentLayoutID(): Int
@@ -33,10 +31,13 @@ abstract class BaseView : Fragment(), ICleanArchitecture.View {
         compositeDisposable = CompositeDisposable()
         rootView = inflater.inflate(getContentLayoutID(), container, false)
         dialogManager = DialogManager(setupActivity())
-        bindViews()
         initPresenter()
-        onCreateViewFragment()
         return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        onCreateViewFragment()
     }
 
     protected abstract fun onCreateViewFragment()
@@ -48,8 +49,9 @@ abstract class BaseView : Fragment(), ICleanArchitecture.View {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        //isDialogVisible = dialogManager.isDialogVisible()
-        dialogManager.dismissDialog()
+        // shouldShowDialog = dialogManager.isDialogVisible()
+        // dialogManager.dismissDialog()
+        // saveManagedDialogs(outState)
         super.onSaveInstanceState(outState)
         Icepick.saveInstanceState(this, outState)
     }
@@ -78,7 +80,7 @@ abstract class BaseView : Fragment(), ICleanArchitecture.View {
     }
 
     override fun showSimpleSnackbarMessage(message: String) {
-        Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT).show()
+        view?.let { Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT).show() }
     }
 
     override fun setupActivity(): BaseActivity = this.activity as BaseActivity

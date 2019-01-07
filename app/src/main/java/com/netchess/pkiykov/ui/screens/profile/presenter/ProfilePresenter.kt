@@ -152,7 +152,7 @@ class ProfilePresenter @Inject constructor(private val firebaseInteractor: Fireb
 
     override fun onLogoutClick() {
         firebaseInteractor.signOut()
-        router.openLoginScreen()
+        router.onLogoutClick()
     }
 
     override fun onAvatarRemoveClick() {

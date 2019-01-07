@@ -4,6 +4,7 @@ import android.app.Application
 import com.google.firebase.database.FirebaseDatabase
 import com.netchess.pkiykov.core.dagger.*
 import com.netchess.pkiykov.core.interactors.InteractorModule
+import com.squareup.leakcanary.LeakCanary
 import javax.inject.Inject
 
 class App : Application() {
@@ -13,6 +14,14 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return
+        }
+        LeakCanary.install(this)
+        // Normal app init code...
+
         applicationComponent = DaggerApplicationComponent.builder()
                 .contextModule(ContextModule(this))
                 .firebaseModule(FirebaseModule())

@@ -15,10 +15,6 @@ class GamesListView : BaseView(), IGamesList.View {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun bindViews() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun getContentLayoutID(): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

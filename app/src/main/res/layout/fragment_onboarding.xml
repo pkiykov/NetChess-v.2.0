@@ -6,7 +6,7 @@
               android:orientation="vertical">
 
     <EditText
-        android:id="@+id/name_edit_text"
+        android:id="@+id/nameField"
         style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:maxLength="60"/>
 
     <EditText
-        android:id="@+id/email_edit_text"
+        android:id="@+id/emailField"
         style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         android:inputType="textEmailAddress"/>
 
     <EditText
-        android:id="@+id/password_edit_text"
+        android:id="@+id/passwordField"
         style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,14 +41,14 @@
         android:textColor="@color/white"/>
 
     <DatePicker
-        android:id="@+id/birthdate_picker"
+        android:id="@+id/birthdate"
         style="@android:style/Widget.DatePicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
     </DatePicker>
 
     <Button
-        android:id="@+id/submit_button"
+        android:id="@+id/submitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

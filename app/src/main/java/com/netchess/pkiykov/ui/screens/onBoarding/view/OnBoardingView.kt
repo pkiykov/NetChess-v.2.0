@@ -1,20 +1,12 @@
 package com.netchess.pkiykov.ui.screens.onBoarding.view
 
-import android.widget.Button
-import android.widget.DatePicker
-import android.widget.EditText
 import com.netchess.pkiykov.R
 import com.netchess.pkiykov.core.App
 import com.netchess.pkiykov.ui.screens.base.BaseView
 import com.netchess.pkiykov.ui.screens.onBoarding.IOnBoarding
+import kotlinx.android.synthetic.main.fragment_onboarding.*
 
 class OnBoardingView : BaseView(), IOnBoarding.View {
-
-    private lateinit var passwordField: EditText
-    private lateinit var emailField: EditText
-    private lateinit var nameField: EditText
-    private lateinit var birthdate: DatePicker
-    private lateinit var submitButton: Button
 
     private lateinit var presenter: IOnBoarding.Presenter
 
@@ -24,20 +16,12 @@ class OnBoardingView : BaseView(), IOnBoarding.View {
         presenter = App.presenterComponent().getOnBoardingPresenter()
     }
 
-    override fun bindViews() {
-        passwordField = rootView.findViewById(R.id.password_edit_text)
-        emailField = rootView.findViewById(R.id.email_edit_text)
-        nameField = rootView.findViewById(R.id.name_edit_text)
-        birthdate = rootView.findViewById(R.id.birthdate_picker)
-        submitButton = rootView.findViewById(R.id.submit_button)
-    }
-
     override fun onCreateViewFragment() {
         submitButton.setOnClickListener {
             presenter.onSubmitButtonClick(
-                    nameField.text.toString(),
-                    emailField.text.toString(),
-                    passwordField.text.toString(),
+                    nameField!!.text.toString(),
+                    emailField!!.text.toString(),
+                    passwordField!!.text.toString(),
                     birthdate.year, birthdate.month, birthdate.dayOfMonth)
         }
     }
@@ -59,15 +43,15 @@ class OnBoardingView : BaseView(), IOnBoarding.View {
     }
 
     override fun showInvalidEmailMessage(errorMessage: String) {
-        emailField.error = errorMessage
+        emailField!!.error = errorMessage
     }
 
     override fun showInvalidUsernameMessage(errorMessage: String) {
-        nameField.error = errorMessage
+        nameField!!.error = errorMessage
     }
 
     override fun showInvalidPasswordMessage(errorMessage: String) {
-        nameField.error = errorMessage
+        nameField!!.error = errorMessage
     }
 
 }

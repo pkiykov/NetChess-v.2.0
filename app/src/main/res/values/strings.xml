@@ -74,6 +74,9 @@
     <string name="fail_to_load_avatar">Can\'t load your avatar. Something went wrong...</string>
     <string name="do_you_want_to_remove_avatar">Do you want to remove this photo?</string>
 
+    <!--Web client Id-->
+    <string name="web_client_id">99744666931-f9pde4frnheq2moudujvnbs68ucvgehv.apps.googleusercontent.com</string>
+
     <!-- TAGS-->
     <item name="avatar_tag" type="id"/>
 

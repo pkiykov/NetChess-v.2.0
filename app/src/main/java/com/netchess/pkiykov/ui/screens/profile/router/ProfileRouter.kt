@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat.requestPermissions
 import com.netchess.pkiykov.ui.BaseActivity
+import com.netchess.pkiykov.ui.MainActivity
 import com.netchess.pkiykov.ui.Screen
 import com.netchess.pkiykov.ui.screens.base.BaseRouter
 import com.theartofdev.edmodo.cropper.CropImage
@@ -50,5 +51,9 @@ class ProfileRouter(dispatcher: BaseActivity) : BaseRouter(dispatcher) {
 
     fun openArchiveGamesScreen(bundle: Bundle) {
         dispatcher.selectFragment(Screen.ARCHIVE_GAMES_LIST, bundle)
+    }
+
+    fun onLogoutClick() {
+        (dispatcher as MainActivity).signOut()
     }
 }

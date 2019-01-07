@@ -1,22 +1,21 @@
 package com.netchess.pkiykov.ui.screens.login.view
 
 import android.support.design.widget.Snackbar
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import com.jakewharton.rxbinding2.widget.RxTextView
+import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent
 import com.netchess.pkiykov.R
 import com.netchess.pkiykov.core.App
+import com.netchess.pkiykov.ui.MainActivity
 import com.netchess.pkiykov.ui.screens.base.BaseView
 import com.netchess.pkiykov.ui.screens.login.ILogin
-import io.reactivex.rxkotlin.Observables
+import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
+import kotlinx.android.synthetic.main.fragment_login.*
+
 
 class LoginView : BaseView(), ILogin.View {
 
-    private lateinit var loginButton: Button
-    private lateinit var registrationButton: Button
-    private lateinit var emailEditText: EditText
-    private lateinit var passwordEditText: EditText
 
     private lateinit var presenter: ILogin.Presenter
 
@@ -26,27 +25,23 @@ class LoginView : BaseView(), ILogin.View {
         presenter = App.presenterComponent().getLoginPresenter()
     }
 
-    override fun bindViews() {
-        loginButton = rootView.findViewById(R.id.login_button)
-        registrationButton = rootView.findViewById(R.id.registration_button)
-        emailEditText = rootView.findViewById(R.id.email_edit_text)
-        passwordEditText = rootView.findViewById(R.id.password_edit_text)
-    }
-
     override fun onCreateViewFragment() {
-        val emailChangeObservable = RxTextView.textChangeEvents(emailEditText)
-        val passwordChangeObservable = RxTextView.textChangeEvents(passwordEditText)
 
-        val disposable = Observables.combineLatest(emailChangeObservable, passwordChangeObservable)
-        { emailTextEvent, passwordTextEvent ->
-            presenter.softValidation(emailTextEvent.text().toString(), passwordTextEvent.text().toString())
-        }.subscribe { isEnabled -> loginButton.isEnabled = isEnabled }
+        val emailChangeObservable = RxTextView.textChangeEvents(emailField)
+        val passwordChangeObservable = RxTextView.textChangeEvents(passwordField)
+
+        signInButton.setOnClickListener { (activity as MainActivity).signIn() }
+
+        val disposable = Observable.combineLatest(emailChangeObservable, passwordChangeObservable,
+                BiFunction { emailTextEvent: TextViewTextChangeEvent, passwordTextEvent: TextViewTextChangeEvent ->
+                    presenter.softValidation(emailTextEvent.text().toString(), passwordTextEvent.text().toString())
+                }).subscribe { isEnabled: Boolean -> loginButton.isEnabled = isEnabled }
 
         addDisposable(disposable)
 
         loginButton.setOnClickListener {
-            presenter.onLoginClick(emailEditText.text.toString(),
-                    passwordEditText.text.toString())
+            presenter.onLoginClick(emailField.text.toString(),
+                    passwordField.text.toString())
         }
 
         registrationButton.setOnClickListener {

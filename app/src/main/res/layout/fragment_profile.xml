@@ -13,7 +13,7 @@
 
         <ImageView
             android:background="@color/transparent"
-            android:id="@+id/avatar_image"
+            android:id="@+id/avatar"
             android:layout_width="@dimen/avatar_size"
             android:layout_height="@dimen/avatar_size"
             android:adjustViewBounds="true"
@@ -23,7 +23,7 @@
             android:src="@drawable/empty_avatar"/>
 
         <TextView
-            android:id="@+id/player_name_text"
+            android:id="@+id/playerName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/app_padding"
@@ -48,7 +48,7 @@
 
             <android.support.v4.widget.SwipeRefreshLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/swipe_container"
+                android:id="@+id/swipeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/logout">

@@ -5,7 +5,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.SwipeRefreshLayout
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.DecodeFormat
@@ -21,14 +24,11 @@ import com.netchess.pkiykov.ui.components.ErrorStyle
 import com.netchess.pkiykov.ui.dialogs.DialogManager
 import com.netchess.pkiykov.ui.screens.base.BaseView
 import com.netchess.pkiykov.ui.screens.profile.IProfile
+import kotlinx.android.synthetic.main.fragment_profile.*
 
 
 class ProfileView : BaseView(), IProfile.View, SwipeRefreshLayout.OnRefreshListener {
 
-    private lateinit var avatar: ImageView
-    private lateinit var logout: Button
-    private lateinit var playerName: TextView
-    private lateinit var swipeLayout: SwipeRefreshLayout
     private lateinit var listView: ListView
     lateinit var presenter: IProfile.Presenter
 
@@ -76,6 +76,7 @@ class ProfileView : BaseView(), IProfile.View, SwipeRefreshLayout.OnRefreshListe
 
         avatar.setTag(R.id.avatar_tag, Constants.EMPTY_AVATAR)
         swipeLayout.setOnRefreshListener(this)
+        listView = rootView.findViewById(android.R.id.list)
         listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
             presenter.onPlayerInfoClick(i)
         }
@@ -100,14 +101,6 @@ class ProfileView : BaseView(), IProfile.View, SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun getPlayerIdFromArguments(): String? = arguments?.getString(PLAYER_ID)
-
-    override fun bindViews() {
-        avatar = rootView.findViewById(R.id.avatar_image)
-        logout = rootView.findViewById(R.id.logout)
-        playerName = rootView.findViewById(R.id.player_name_text)
-        swipeLayout = rootView.findViewById(R.id.swipe_container)
-        listView = rootView.findViewById(android.R.id.list)
-    }
 
     override fun onAvatarRemoved() {
         avatar.setImageResource(R.drawable.empty_avatar)
@@ -190,10 +183,12 @@ class ProfileView : BaseView(), IProfile.View, SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun showProgressDialog() {
-        swipeLayout.isRefreshing = true
+        super.showProgressDialog()
+        swipeLayout?.isRefreshing = true
     }
 
     override fun dismissProgressDialog() {
-        swipeLayout.isRefreshing = false
+        super.dismissProgressDialog()
+        swipeLayout?.isRefreshing = false
     }
 }

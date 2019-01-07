@@ -7,7 +7,7 @@
               android:orientation="vertical">
 
     <EditText
-        android:id="@+id/email_edit_text"
+        android:id="@+id/emailField"
         style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
         android:inputType="textEmailAddress"/>
 
     <EditText
-        android:id="@+id/password_edit_text"
+        android:id="@+id/passwordField"
         style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:layout_margin="@dimen/onboarding_default_padding">
 
         <Button
-            android:id="@+id/login_button"
+            android:id="@+id/loginButton"
             android:layout_width="@dimen/login_button_width"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -38,7 +38,7 @@
             android:textColor="@color/white"/>
 
         <Button
-            android:id="@+id/registration_button"
+            android:id="@+id/registrationButton"
             android:layout_width="@dimen/login_button_width"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -48,5 +48,20 @@
             android:textColor="@color/white"/>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/onboarding_default_padding"
+        android:layout_marginEnd="@dimen/onboarding_default_padding"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/signInButton"
+            android:layout_width="@dimen/login_button_width"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </LinearLayout>
