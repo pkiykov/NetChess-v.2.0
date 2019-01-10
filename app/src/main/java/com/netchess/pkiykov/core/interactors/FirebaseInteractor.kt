@@ -1,8 +1,7 @@
 package com.netchess.pkiykov.core.interactors
 
 import android.net.Uri
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.*
 import com.google.firebase.database.*
 import com.google.firebase.storage.StorageReference
 import com.netchess.pkiykov.core.Constants
@@ -59,10 +58,10 @@ class FirebaseInteractor @Inject constructor(private val firebaseAuth: FirebaseA
             }
             return null
         }
+    val currentUser: FirebaseUser?
+        get() = firebaseAuth.currentUser
 
-    private fun getCurrentUser() = firebaseAuth.currentUser
-
-    private fun getCurrentUserId() = getCurrentUser()?.uid
+    private fun getCurrentUserId() = currentUser?.uid
 
     fun isCurrentUser() = getCurrentUserId() == playerId
 
@@ -71,7 +70,7 @@ class FirebaseInteractor @Inject constructor(private val firebaseAuth: FirebaseA
                 if (playerDatabaseReference == null) {
                     emitter.onError(PlayerNotFoundException())
                 } else {
-                    playerDatabaseReference!!.addValueEventListener(object : ValueEventListener {
+                    playerDatabaseReference?.addListenerForSingleValueEvent(object : ValueEventListener {
 
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
                             player = dataSnapshot.getValue(object : GenericTypeIndicator<Player>() {})
@@ -111,7 +110,7 @@ class FirebaseInteractor @Inject constructor(private val firebaseAuth: FirebaseA
             Completable.fromAction {
                 playerDatabaseReference?.child(Constants.BIRTHDATE)?.setValue(date)
                         ?.addOnSuccessListener {
-                            player!!.birthdate = date
+                            player?.birthdate = date
                             Completable.complete()
                         }
                         ?.addOnFailureListener { Completable.error(it) }
@@ -119,7 +118,7 @@ class FirebaseInteractor @Inject constructor(private val firebaseAuth: FirebaseA
                     .observeOn(AndroidSchedulers.mainThread())
 
     fun removePlayer() {
-        getCurrentUser()?.delete()
+        currentUser?.delete()
         playerDatabaseReference?.removeValue()
         playerStorageReference?.delete()
         firebaseAuth.signOut()
@@ -149,6 +148,73 @@ class FirebaseInteractor @Inject constructor(private val firebaseAuth: FirebaseA
                         ?.addOnFailureListener { Completable.error(it) }
             }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+
+    fun removeListener(firebaseAuthStateListener: FirebaseAuth.AuthStateListener) {
+        firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
+    }
+
+    fun addListener(firebaseAuthStateListener: FirebaseAuth.AuthStateListener) {
+        firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
+    }
+
+    fun getListener(function: () -> Unit) = FirebaseAuth.AuthStateListener { function.invoke() }
+    fun isLoggedIn() = firebaseAuth.currentUser != null
+
+    fun firebaseAuthWithCredential(credential: AuthCredential, listener: FirebaseListener) {
+        firebaseAuth.signInWithCredential(credential).continueWith {
+            registerUserWithDefaultParams()
+        }
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        listener.onSuccess()
+                    } else {
+                        listener.onError(Throwable(task.exception))
+                    }
+                }
+    }
+
+    private fun registerUserWithDefaultParams() {
+        val user = firebaseAuth.currentUser
+        if (user != null) {
+            val playerId = user.uid
+            playerDatabaseReference?.addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {}
+
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (!dataSnapshot.exists()) {
+                        val playerName = user.displayName ?: ""
+                        val player = Player(playerId, playerName)
+                        playerDatabaseReference?.setValue(player)
+                                ?.continueWithTask {
+                                    val profileUpdates = UserProfileChangeRequest.Builder()
+                                            .setDisplayName(playerName).build()
+                                    user.updateProfile(profileUpdates)
+                                }
+                    }
+                }
+            })
+        }
+    }
+
+    fun firebaseAuthWithCredential(credential: AuthCredential): Single<AuthResult> =
+            Single.create {
+                firebaseAuth.signInWithCredential(credential)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                it.onSuccess(task.result!!)
+                            } else {
+                                val exception = task.exception
+                                it.onError(Throwable(exception))
+                            }
+                        }
+            }
+
+    interface FirebaseListener {
+
+        fun onSuccess()
+
+        fun onError(throwable: Throwable)
+    }
 
 }
 

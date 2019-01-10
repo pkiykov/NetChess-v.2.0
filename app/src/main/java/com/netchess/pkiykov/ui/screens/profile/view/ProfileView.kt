@@ -16,6 +16,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.google.firebase.storage.StorageException
 import com.netchess.pkiykov.R
 import com.netchess.pkiykov.core.App
 import com.netchess.pkiykov.core.Constants
@@ -167,7 +168,6 @@ class ProfileView : BaseView(), IProfile.View, SwipeRefreshLayout.OnRefreshListe
 
     override fun showPlayerStats(playerStats: Array<String>) {
         listView.adapter = ArrayAdapter(context!!, android.R.layout.simple_list_item_1, android.R.id.text1, playerStats)
-        playerName.text = name
     }
 
     override fun setPlayerName(name: String?) {
@@ -190,5 +190,11 @@ class ProfileView : BaseView(), IProfile.View, SwipeRefreshLayout.OnRefreshListe
     override fun dismissProgressDialog() {
         super.dismissProgressDialog()
         swipeLayout?.isRefreshing = false
+    }
+
+    override fun handleError(throwable: Throwable) {
+        if (throwable !is StorageException) {
+            super.handleError(throwable)
+        }
     }
 }

@@ -17,67 +17,63 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.netchess.pkiykov.R
 import com.netchess.pkiykov.core.App
+import com.netchess.pkiykov.core.interactors.FacebookInteractor
+import com.netchess.pkiykov.core.interactors.FirebaseInteractor
+import com.netchess.pkiykov.core.interactors.GoogleInteractor
 import com.netchess.pkiykov.ui.NavigationItem.*
 import com.netchess.pkiykov.ui.screens.login.view.LoginView
 import com.netchess.pkiykov.ui.screens.onBoarding.view.OnBoardingView
 import com.netchess.pkiykov.ui.screens.profile.view.ProfileView
 import com.theartofdev.edmodo.cropper.CropImage
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
-
 
 class MainActivity : BaseActivity() {
 
     @Inject
-    lateinit var firebaseAuth: FirebaseAuth
+    lateinit var firebaseInteractor: FirebaseInteractor
+    @Inject
+    lateinit var googleInteractor: GoogleInteractor
+    @Inject
+    lateinit var facebookInteractor: FacebookInteractor
+
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToggle: ActionBarDrawerToggle
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private var isLoggedIn = false
     override val contentViewId = R.layout.activity_main
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateActivity(savedInstanceState: Bundle?) {
         App.applicationComponent.inject(this)
         initViews()
 
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-                .requestEmail()
-                .build()
+        signOut()
 
-        // Build a GoogleSignInClient with the options specified by gso.
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        isLoggedIn = firebaseInteractor.isLoggedIn()
 
         if (getMainFragment() == null) {
             openFirstScreen()
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-        // updateUI(account)
+    private fun openLoginScreen() {
+        fragment = LoginView.getInstance()
+        setFragment(R.id.container, fragment!!, true)
     }
 
-    private fun updateUI(account: GoogleSignInAccount?) {
-        if (account == null) {
-            fragment?.showSimpleSnackbarMessage("u have been signed out")
-        } else {
-            fragment?.showSimpleSnackbarMessage("weeeelcome, ${account.displayName} !!!")
-        }
+    /* override fun onStart() {
+         super.onStart()
+         // Check if user is still signed in
+         checkIfUserIsSignedIn()
+         val account = GoogleSignIn.getLastSignedInAccount(this)
+         // updateUI(account)
+     }*/
 
-        openFirstScreen()
-    }
 
     private fun initViews() {
         setSupportActionBar(toolbar)
@@ -127,19 +123,20 @@ class MainActivity : BaseActivity() {
         drawerLayout.post { enableNavigationItem(CURRENT_GAME, false) }
     }
 
-    fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+    fun signInWithGoogle() {
+        val signInIntent = googleInteractor.googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
     }
 
     private fun openFirstScreen() {
-        fragment = if (firebaseAuth.currentUser == null) {
-            LoginView.getInstance()
-        } else {
+        fragment = if (isLoggedIn) {
             ProfileView.getInstance()
+        } else {
+            LoginView.getInstance()
         }
         setFragment(R.id.container, fragment!!, true)
     }
+
 
     override fun selectFragment(fragmentName: IScreen, data: Bundle?, addToBackStack: Boolean, animation: FragmentAnimation?) {
         var shouldAddToBackStack = addToBackStack
@@ -190,10 +187,10 @@ class MainActivity : BaseActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
-    private val firebaseAuthStateListener: FirebaseAuth.AuthStateListener = FirebaseAuth.AuthStateListener {
-        val user = firebaseAuth.currentUser
-        enableNavigationItem(NavigationItem.PROFILE, user != null)
-    }
+    private val firebaseAuthStateListener
+        get() = firebaseInteractor
+                .getListener { enableNavigationItem(NavigationItem.PROFILE, firebaseInteractor.currentUser != null) }
+
 
     private fun enableNavigationItem(item: NavigationItem, enable: Boolean) {
         navigationView.menu.getItem(item.order).isEnabled = enable
@@ -201,17 +198,16 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
-
+        firebaseInteractor.addListener(firebaseAuthStateListener)
     }
 
     override fun onPause() {
         super.onPause()
-        firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
+        firebaseInteractor.removeListener(firebaseAuthStateListener)
     }
 
     companion object {
-        private const val RC_SIGN_IN = 3476
+        private const val RC_GOOGLE_SIGN_IN = 3476
     }
 
 
@@ -222,63 +218,57 @@ class MainActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account!!)
-            } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
+        if (requestCode == RC_GOOGLE_SIGN_IN) {
 
-                // ...
-            }
-        }
+            val disposable = googleInteractor.proceedWithAuthData(data)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ onSuccessLogin() }, { onFailLogin() })
+            compositeDisposable.add(disposable)
+        } else
         // handle result of pick image chooser
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val imageUri = CropImage.getPickImageResultUri(this, data)
-            // For API >= 23 we need to check specifically that we have permissions to read external storage.
-            if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
-                // request permissions and handle the result in onRequestPermissionsResult()
-                cropImageUri = imageUri
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE)
+            if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+                val imageUri = CropImage.getPickImageResultUri(this, data)
+                // For API >= 23 we need to check specifically that we have permissions to read external storage.
+                if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
+                    // request permissions and handle the result in onRequestPermissionsResult()
+                    cropImageUri = imageUri
+                    requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE)
+                } else {
+                    getProfileView()?.presenter?.startCropImageActivity(imageUri)
+                }
+            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode == Activity.RESULT_OK) {
+                    getProfileView()?.presenter?.uploadAvatar(result.uri)
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    //TODO: Add logging
+                    // val error = result.error
+                    Snackbar.make(drawerLayout, R.string.image_has_not_been_selected, Snackbar.LENGTH_SHORT).show()
+                }
             } else {
-                getProfileView()?.presenter?.startCropImageActivity(imageUri)
+                val isUserLoggedIn = firebaseInteractor.isLoggedIn()
+                if (isLoggedIn != isUserLoggedIn) {
+                    isLoggedIn = isUserLoggedIn
+                    openFirstScreen()
+                }
             }
-        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode == Activity.RESULT_OK) {
-                getProfileView()?.presenter?.uploadAvatar(result.uri)
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                //TODO: Add logging
-                // val error = result.error
-                Snackbar.make(drawerLayout, R.string.image_has_not_been_selected, Snackbar.LENGTH_SHORT).show()
-            }
-        }
     }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-        // [START_EXCLUDE silent]
-        fragment?.showProgressDialog()
-        // [END_EXCLUDE]
+    fun onFailLogin() {
+        isLoggedIn = false
+        fragment?.showSimpleSnackbarMessage("something went wrong :(")
+    }
 
-        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-        firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this) { task ->
-                    fragment?.dismissProgressDialog()
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        val user = firebaseAuth.currentUser
-                        // updateUI(user)
-                        user?.let {
-                            fragment?.showSimpleSnackbarMessage("weeeelcome, ${user.displayName} !!!")
-                            openFirstScreen()
-                        }
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        updateUI(null)
-                    }
-                }
+    fun onSuccessLogin() {
+        // Sign in success, update UI with the signed-in user's information
+        val user = firebaseInteractor.currentUser
+        // updateUI(user)
+        user?.let {
+            isLoggedIn = true
+            fragment?.showSimpleSnackbarMessage("weeeelcome, ${user.displayName} !!!")
+            openFirstScreen()
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -313,12 +303,10 @@ class MainActivity : BaseActivity() {
     }
 
     fun signOut() {
-        // Firebase sign out
-        firebaseAuth.signOut()
-
-        // Google sign out
-        googleSignInClient.signOut().addOnCompleteListener(this) {
-            updateUI(null)
-        }
+        firebaseInteractor.signOut()
+        facebookInteractor.signOut()
+        isLoggedIn = false
+        fragment?.showSimpleSnackbarMessage("u have been signed out")
+        openLoginScreen()
     }
 }

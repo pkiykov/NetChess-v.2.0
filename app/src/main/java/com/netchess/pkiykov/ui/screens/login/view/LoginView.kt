@@ -1,5 +1,6 @@
 package com.netchess.pkiykov.ui.screens.login.view
 
+import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.widget.Toast
 import com.jakewharton.rxbinding2.widget.RxTextView
@@ -12,7 +13,6 @@ import com.netchess.pkiykov.ui.screens.login.ILogin
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_login.*
-
 
 class LoginView : BaseView(), ILogin.View {
 
@@ -30,7 +30,7 @@ class LoginView : BaseView(), ILogin.View {
         val emailChangeObservable = RxTextView.textChangeEvents(emailField)
         val passwordChangeObservable = RxTextView.textChangeEvents(passwordField)
 
-        signInButton.setOnClickListener { (activity as MainActivity).signIn() }
+        googleSignInButton.setOnClickListener { (activity as MainActivity).signInWithGoogle() }
 
         val disposable = Observable.combineLatest(emailChangeObservable, passwordChangeObservable,
                 BiFunction { emailTextEvent: TextViewTextChangeEvent, passwordTextEvent: TextViewTextChangeEvent ->
@@ -49,6 +49,11 @@ class LoginView : BaseView(), ILogin.View {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presenter.passFacebookLoginResult(requestCode, resultCode, data)
+    }
+
     override fun getContentLayoutID(): Int = R.layout.fragment_login
 
     override fun showCredTooShortMessage() {
@@ -62,12 +67,13 @@ class LoginView : BaseView(), ILogin.View {
     companion object {
 
         fun getInstance(): LoginView = LoginView()
-
     }
 
     override fun onResume() {
         super.onResume()
         presenter.attachView(this)
+        facebookSignInButton?.let { presenter.registerFacebookButton(it) }
+
     }
 
     override fun onPause() {

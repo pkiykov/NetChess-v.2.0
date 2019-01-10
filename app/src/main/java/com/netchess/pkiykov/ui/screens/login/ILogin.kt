@@ -1,5 +1,7 @@
 package com.netchess.pkiykov.ui.screens.login
 
+import android.content.Intent
+import com.facebook.login.widget.LoginButton
 import com.netchess.pkiykov.ui.screens.base.ICleanArchitecture
 
 interface ILogin {
@@ -16,5 +18,7 @@ interface ILogin {
         fun onBoardingClick()
         fun attachView(view: View)
         fun detachView()
+        fun registerFacebookButton(facebookSignInButton: LoginButton)
+        fun passFacebookLoginResult(requestCode: Int, resultCode: Int, data: Intent?)
     }
 }

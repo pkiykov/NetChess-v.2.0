@@ -19,4 +19,7 @@
     <dimen name="login_button_width">120dp</dimen>
     <dimen name="onboarding_edit_text_field_width">288dp</dimen>
     <dimen name="half_avatar_size">60dp</dimen>
+
+    <!--Login -->
+    <dimen name="sign_in_button_margin">30dp</dimen>
 </resources>

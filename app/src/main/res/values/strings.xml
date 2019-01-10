@@ -32,6 +32,7 @@
     <string name="age">Age:</string>
     <string name="rating">Rating:</string>
     <string name="total">Total games:</string>
+    <string name="unknown_age">Unknown</string>
 
     <!--OnBoarding screen -->
     <string name="hintEmail">Email</string>
@@ -79,6 +80,10 @@
 
     <!-- TAGS-->
     <item name="avatar_tag" type="id"/>
+
+    <!-- Facebook SDK-->
+    <string name="facebook_app_id">663044854126640</string>
+    <string name="fb_login_protocol_scheme">fb663044854126640</string>
 
 
 </resources>

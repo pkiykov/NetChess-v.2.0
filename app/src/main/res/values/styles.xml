@@ -11,10 +11,7 @@
     </style>
 
     <style name="onBoarding_margin">
-        <item name="android:layout_marginStart">@dimen/onboarding_default_padding</item>
-        <item name="android:layout_marginEnd">@dimen/onboarding_default_padding</item>
-        <item name="android:layout_marginRight">@dimen/onboarding_default_padding</item>
-        <item name="android:layout_marginLeft">@dimen/onboarding_default_padding</item>
+        <item name="android:layout_marginTop">@dimen/onboarding_default_padding</item>
     </style>
 
     <style name="onBoarding_edit_text_field" parent="onBoarding_margin">

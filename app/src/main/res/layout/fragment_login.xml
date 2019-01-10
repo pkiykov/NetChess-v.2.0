@@ -7,16 +7,18 @@
               android:orientation="vertical">
 
     <EditText
+        android:layout_marginStart="@dimen/onboarding_default_padding"
+        android:layout_marginEnd="@dimen/onboarding_default_padding"
         android:id="@+id/emailField"
-        style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hintEmail"
         android:inputType="textEmailAddress"/>
 
     <EditText
+        android:layout_marginStart="@dimen/onboarding_default_padding"
+        android:layout_marginEnd="@dimen/onboarding_default_padding"
         android:id="@+id/passwordField"
-        style="@style/onBoarding_edit_text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hintPass"
@@ -58,10 +60,16 @@
         android:orientation="vertical">
 
         <com.google.android.gms.common.SignInButton
-            android:id="@+id/signInButton"
+            android:id="@+id/googleSignInButton"
             android:layout_width="@dimen/login_button_width"
             android:layout_height="wrap_content" />
 
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/facebookSignInButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/sign_in_button_margin" />
     </LinearLayout>
 
 </LinearLayout>

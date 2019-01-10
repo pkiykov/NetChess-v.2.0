@@ -11,7 +11,7 @@ import java.util.*
 @Parcelize
 data class Player(val id: String = "",
                   var name: String = "",
-                  var birthdate: String = "1970-01-01",
+                  var birthdate: String = "",
                   var rating: Int = INITIAL_PLAYER_RATING,
                   var wins: Int = 0,
                   var losses: Int = 0,
@@ -20,10 +20,11 @@ data class Player(val id: String = "",
     val age: Int
         get() {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-            var birth: Date? = null
+            val birth: Date?
             try {
                 birth = dateFormat.parse(this.birthdate)
             } catch (e: ParseException) {
+                return 0
             }
 
             val current = Date()

@@ -9,7 +9,6 @@ import com.netchess.pkiykov.core.Constants
 import com.netchess.pkiykov.core.PlayerInfo
 import com.netchess.pkiykov.core.dagger.ForApplication
 import com.netchess.pkiykov.core.exceptions.PlayerNotFoundException
-import com.netchess.pkiykov.core.exceptions.UnsupportedPlayerInfoException
 import com.netchess.pkiykov.core.interactors.FirebaseInteractor
 import com.netchess.pkiykov.core.models.Player
 import com.netchess.pkiykov.ui.BaseActivity
@@ -71,15 +70,13 @@ class ProfilePresenter @Inject constructor(private val firebaseInteractor: Fireb
         return outValue.float
     }
 
+    private fun loadPlayer() = firebaseInteractor.getPlayer()
+
     override fun loadPlayerInfo() {
-        compositeDisposable.add(firebaseInteractor.getPlayer()
-                .doOnSubscribe {
-                    doSafelyWithView {
-                        showProgressDialog()
-                        playerNotAvailable(getTransparencyValue())
-                    }
-                }
-                .doFinally { doSafelyWithView { dismissProgressDialog() } }
+        doSafelyWithView {
+            playerNotAvailable(getTransparencyValue())
+        }
+        compositeDisposable.add(loadPlayer()
                 .subscribe({
                     loadPhoto()
                     createPlayer(it)
@@ -87,32 +84,40 @@ class ProfilePresenter @Inject constructor(private val firebaseInteractor: Fireb
                         doSafelyWithView { activatePlayer() }
                     }
                 }, { error ->
-                    when (error) {
-                        PlayerNotFoundException() -> {
-                            doSafelyWithView { showError(ErrorStyle.PLAYER_NOT_EXIST) }
-                            if (firebaseInteractor.isCurrentUser()) {
-                                firebaseInteractor.removePlayer()
-                            }
-                            router.openPreviousScreen()
-                        }
-                        else -> doSafelyWithView { showError(ErrorStyle.UNKNOWN_ERROR) }
-                    }
+                    handleError(error)
                 }))
     }
 
+    private fun handleError(error: Throwable?) {
+        when (error) {
+            PlayerNotFoundException() -> {
+                doSafelyWithView { showError(ErrorStyle.PLAYER_NOT_EXIST) }
+                if (firebaseInteractor.isCurrentUser()) {
+                    firebaseInteractor.removePlayer()
+                }
+                router.openPreviousScreen()
+            }
+            else -> doSafelyWithView { showError(ErrorStyle.UNKNOWN_ERROR) }
+        }
+    }
+
     private fun createPlayer(player: Player) {
-        val totalGames = player.wins + player.draws + player.losses
-        val list = arrayOf(
-                context.getString(R.string.rating) + player.rating,
-                context.getString(R.string.age) + player.age,
-                context.getString(R.string.wins) + player.wins,
-                context.getString(R.string.losses) + player.losses,
-                context.getString(R.string.draws) + player.draws,
-                context.getString(R.string.total) + totalGames)
         doSafelyWithView {
-            showPlayerStats(list)
+            showPlayerStats(getPlayerStats(player))
             setPlayerName(player.name)
         }
+    }
+
+    private fun getPlayerStats(player: Player): Array<String> {
+        val totalGames = player.wins + player.draws + player.losses
+        val age = getFormattedAge(player)
+        return arrayOf(
+                context.getString(R.string.rating) + " " + player.rating,
+                context.getString(R.string.age) + " " + age,
+                context.getString(R.string.wins) + " " + player.wins,
+                context.getString(R.string.losses) + " " + player.losses,
+                context.getString(R.string.draws) + " " + player.draws,
+                context.getString(R.string.total) + " " + totalGames)
     }
 
     private fun loadPhoto() {
@@ -132,12 +137,6 @@ class ProfilePresenter @Inject constructor(private val firebaseInteractor: Fireb
             doSafelyWithView { onFailToChangeName(context.resources.getString(R.string.name_can_not_be_empty)) }
         } else {
             compositeDisposable.add(firebaseInteractor.setPlayerName(name)
-                    .doOnSubscribe {
-                        doSafelyWithView {
-                            showProgressDialog()
-                        }
-                    }
-                    .doFinally { doSafelyWithView { dismissProgressDialog() } }
                     .subscribe(
                             { doSafelyWithView { onNameChanged(name) } },
                             {
@@ -157,12 +156,6 @@ class ProfilePresenter @Inject constructor(private val firebaseInteractor: Fireb
 
     override fun onAvatarRemoveClick() {
         compositeDisposable.add(firebaseInteractor.removeAvatar()
-                .doOnSubscribe {
-                    doSafelyWithView {
-                        showProgressDialog()
-                    }
-                }
-                .doFinally { doSafelyWithView { dismissProgressDialog() } }
                 .subscribe({ doSafelyWithView { onAvatarRemoved() } },
                         {
                             doSafelyWithView {
@@ -194,25 +187,19 @@ class ProfilePresenter @Inject constructor(private val firebaseInteractor: Fireb
                 router.openArchiveGamesScreen(bundle)
             }
             else -> {
-                throw UnsupportedPlayerInfoException()
+                // throw UnsupportedPlayerInfoException()
             }
         }
     }
 
+    private fun getFormattedAge(player: Player) = if (player.age == 0) context.getString(R.string.unknown_age) else player.age.toString()
+
     override fun onBirthdateChanged(date: String) {
         compositeDisposable.add(firebaseInteractor.setBirthdate(date)
-                .doOnSubscribe {
-                    doSafelyWithView {
-                        showProgressDialog()
-                    }
-                }
-                .doFinally { doSafelyWithView { dismissProgressDialog() } }
-                .subscribe({
-                    doSafelyWithView { showBirthdateIsChangedMessage() }
-                }, {
-                    doSafelyWithView {
-                        handleError(it)
-                    }
-                }))
+                .subscribe {
+                    loadPlayer().subscribe(
+                            { player -> doSafelyWithView { showPlayerStats(getPlayerStats(player)) } },
+                            { throwable -> handleError(throwable) })
+                })
     }
 }

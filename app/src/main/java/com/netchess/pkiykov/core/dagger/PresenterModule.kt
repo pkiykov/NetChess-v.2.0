@@ -2,6 +2,7 @@ package com.netchess.pkiykov.core.dagger
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
+import com.netchess.pkiykov.core.interactors.FacebookInteractor
 import com.netchess.pkiykov.core.interactors.FirebaseInteractor
 import com.netchess.pkiykov.core.utils.TextValidator
 import com.netchess.pkiykov.ui.screens.PerScreen
@@ -24,8 +25,9 @@ class PresenterModule {
     @PerScreen
     fun provideLoginPresenter(firebaseAuth: FirebaseAuth,
                               validator: TextValidator,
+                              facebookInteractor: FacebookInteractor,
                               @ForApplication appContext: Context): LoginPresenter =
-            LoginPresenter(firebaseAuth, validator, appContext)
+            LoginPresenter(firebaseAuth, validator, facebookInteractor, appContext)
 
     @Provides
     @PerScreen
