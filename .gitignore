@@ -8,6 +8,5 @@
 .externalNativeBuild
 
 instapk.log*
-/app/google-services.json
 /instapk.properties
 .idea/instapk.xml
