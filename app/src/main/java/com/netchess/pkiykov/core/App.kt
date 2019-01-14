@@ -1,13 +1,13 @@
 package com.netchess.pkiykov.core
 
-import android.app.Application
+import android.support.multidex.MultiDexApplication
 import com.google.firebase.database.FirebaseDatabase
 import com.netchess.pkiykov.core.dagger.*
 import com.netchess.pkiykov.core.interactors.InteractorModule
 import com.squareup.leakcanary.LeakCanary
 import javax.inject.Inject
 
-class App : Application() {
+class App : MultiDexApplication() {
 
     @Inject
     lateinit var firebaseDatabase: FirebaseDatabase
